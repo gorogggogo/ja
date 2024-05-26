@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ごろうくえすと</title>
+</head>
+<body>
+    <h1>ごろうくえすと</h1>
+    <p id="result"></p>
+    <button onclick="playGame()">ゲームをプレイする</button>
+
+    <!-- 音楽を再生するためのaudio要素 -->
+    <audio id="victoryAudio" src="victory.mp3"></audio>
+
+    <script>
+        // プレイヤーの名前
+        const player = "ごろう";
+
+        // 敵のリスト
+        const enemies = [
+            { name: "スライム", hp: 10 },
+            { name: "スライムベス", hp: 15 },
+            { name: "スライムマデュラ", hp: 20 },
+            { name: "キングスライム", hp: 30 },
+            { name: "メタルスライム", hp: 5 },
+            { name: "はぐれメタル", hp: 8 },
+            { name: "メタルキング", hp: 12 },
+            { name: "ゴールデンスライム", hp: 50 }
+        ];
+
+        let currentEnemyIndex = 0;
+
+        // ジャンケンの手
+        const hands = ["グー", "チョキ", "パー"];
+
+        // ジャンケンの手を選ぶ関数
+        function chooseHand() {
+            return hands[Math.floor(Math.random() * hands.length)];
+        }
+
+        // ジャンケンの結果を判定する関数
+        function janken() {
+            const playerHand = chooseHand();
+            const enemyHand = chooseHand();
+
+            let result = "";
+
+            if (
+                (playerHand === "グー" && enemyHand === "チョキ") ||
+                (playerHand === "チョキ" && enemyHand === "パー") ||
+                (playerHand === "パー" && enemyHand === "グー")
+            ) {
+                result = "あなたの勝ち！";
+            } else if (
+                (playerHand === "グー" && enemyHand === "パー") ||
+                (playerHand === "チョキ" && enemyHand === "グー") ||
+                (playerHand === "パー" && enemyHand === "チョキ")
+            ) {
+                result = "敵の勝ち！";
+            } else {
+                result = "引き分け！";
+            }
+
+            document.getElementById("result").innerText = `あなたの手: ${playerHand}\n敵の手: ${enemyHand}\n${result}`;
+        }
+
+        // ゲームをプレイする関数
+        function playGame() {
+            if (currentEnemyIndex >= enemies.length) {
+                document.getElementById("result").innerText = "すべての敵を倒した！ゲームクリア！";
+                
+                // ゲームクリア時に音楽を再生する
+                const audio = document.getElementById("victoryAudio");
+                audio.play();
+                
+                return;
+            }
+
+            const enemy = enemies[currentEnemyIndex];
+            document.getElementById("result").innerText = `${enemy.name}が現れた！　（HP: ${enemy.hp}）`;
+
+            // ジャンケンで勝敗を決定
+            janken();
+
+            // もし敵に負けたら、最初のスライムに戻る
+            if (document.getElementById("result").innerText.includes("敵の勝ち") || document.getElementById("result").innerText.includes("引き分け")) {
+                currentEnemyIndex = 0;
+                document.getElementById("result").innerText += "\n最初のスライムに戻りました！";
+            } else {
+                currentEnemyIndex++;
+            }
+
+            // ゴールデンスライムを倒した場合、ゲームクリア
+            if (enemy.name === "ゴールデンスライム" && document.getElementById("result").innerText.includes("あなたの勝ち")) {
+                document.getElementById("result").innerText += "\nゲームクリア！ゴールデンスライムを倒しました！";
+                
+                // ゲームクリア時に音楽を再生する
+                const audio = document.getElementById("victoryAudio");
+                audio.play();
+            } else {
+                document.getElementById("result").innerText += `\n${enemy.name}に挑戦！`;
+            }
+        }
+    </script>
+</body>
+</html>
